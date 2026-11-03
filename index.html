@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Hours">
+<meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<title>Hours</title>
+<style>
+:root {
+  --bg: #F2F2F7; --card: #FFFFFF; --text: #000000;
+  --text2: rgba(60,60,67,.6); --text3: rgba(60,60,67,.3);
+  --sep: rgba(60,60,67,.2); --fill: rgba(120,120,128,.12); --fill2: rgba(120,120,128,.2);
+  --bar: rgba(249,249,249,.8);
+  --ocala: #FF9500; --orlando: #007AFF; --home: #34C759; --red: #FF3B30;
+  --accent: var(--ocala);
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #000000; --card: #1C1C1E; --text: #FFFFFF;
+    --text2: rgba(235,235,245,.6); --text3: rgba(235,235,245,.3);
+    --sep: rgba(84,84,88,.65); --fill: rgba(118,118,128,.24); --fill2: rgba(118,118,128,.32);
+    --bar: rgba(22,22,24,.8);
+    --ocala: #FF9F0A; --orlando: #0A84FF; --home: #30D158; --red: #FF453A;
+  }
+}
+body[data-mode="orlando"] { --accent: var(--orlando); }
+body[data-mode="home"] { --accent: var(--home); }
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); }
+body {
+  position: fixed; inset: 0; overflow: hidden; overscroll-behavior: none;
+  font: 17px/1.3 -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%;
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+}
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+input { font: inherit; color: inherit; }
+svg.i { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* ---------- Views ---------- */
+.view {
+  position: absolute; inset: 0; display: none;
+  overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+  padding: calc(env(safe-area-inset-top) + 10px) 16px calc(env(safe-area-inset-bottom) + 92px);
+}
+.view.active { display: block; animation: fade .18s ease-out; }
+@keyframes fade { from { opacity: .4; } to { opacity: 1; } }
+
+.eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; color: var(--text2); }
+h1 { font-size: 34px; font-weight: 700; letter-spacing: -.02em; margin: 2px 0 0; }
+.hrow { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.pill {
+  background: var(--fill); border-radius: 999px; padding: 7px 12px; font-size: 15px; font-weight: 600;
+  white-space: nowrap; margin-bottom: 4px;
+}
+.pill span { color: var(--text2); font-weight: 500; }
+
+/* Segmented control */
+.seg { display: flex; background: var(--fill); border-radius: 12px; padding: 3px; gap: 3px; margin: 16px 0 6px; }
+.seg button {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+  height: 40px; border-radius: 9px; font-size: 15px; font-weight: 600; color: var(--text2);
+  transition: background .2s, color .2s;
+}
+.seg button svg { width: 20px; height: 20px; }
+.seg button.on { background: var(--card); color: var(--text); box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.seg button.on svg { color: var(--m); }
+.seg [data-m="ocala"] { --m: var(--ocala); }
+.seg [data-m="orlando"] { --m: var(--orlando); }
+.seg [data-m="home"] { --m: var(--home); }
+
+/* Ring */
+.ringwrap { position: relative; width: min(240px, 62vw); aspect-ratio: 1; margin: 18px auto 8px; }
+.ring { width: 100%; height: 100%; display: block; }
+.ring circle { fill: none; stroke-width: 16; }
+.ring .track { stroke: var(--fill); }
+.ring .prog { stroke: var(--accent); stroke-linecap: round; transition: stroke-dashoffset .6s ease, stroke .3s; }
+.ring-c { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ring-c .big { font-size: 64px; font-weight: 700; letter-spacing: -.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+.ring-c .unit { font-size: 15px; color: var(--text2); font-weight: 600; margin-top: 4px; }
+.ring-c .sub { font-size: 13px; color: var(--text3); margin-top: 6px; font-variant-numeric: tabular-nums; }
+.status { text-align: center; font-size: 15px; color: var(--text2); display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 22px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text3); }
+.dot.live { background: var(--accent); animation: pulse 1.6s infinite; }
+.dot.paused { background: var(--ocala); }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+
+/* Target card */
+.card { background: var(--card); border-radius: 16px; padding: 14px 16px; }
+.tcard { margin: 14px 0 14px; display: flex; align-items: center; gap: 14px; }
+.tcard .ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--accent); color: #fff; flex: none; }
+.tcard .k { font-size: 13px; color: var(--text2); font-weight: 600; }
+.tcard .t { font-size: 28px; font-weight: 700; letter-spacing: -.02em; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.tcard .s { font-size: 13px; color: var(--text2); margin-top: 1px; }
+.tcard.warn .ic { background: var(--red); }
+
+/* Buttons */
+.actions { display: grid; gap: 10px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn {
+  height: 56px; border-radius: 16px; font-size: 18px; font-weight: 600;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: transform .12s, opacity .12s;
+}
+.btn:active { transform: scale(.97); opacity: .85; }
+.btn.primary { background: var(--accent); color: #fff; }
+.btn.tinted { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
+.btn.gray { background: var(--fill); color: var(--text); }
+.btn.danger { background: color-mix(in srgb, var(--red) 15%, transparent); color: var(--red); }
+.btn.xl { height: 64px; font-size: 20px; }
+.btn small { font-weight: 500; opacity: .75; font-size: 15px; }
+.link { color: var(--accent); font-size: 15px; font-weight: 500; padding: 10px; text-align: center; }
+
+/* Install hint */
+.hint-card { background: var(--card); border-radius: 14px; padding: 12px 14px; font-size: 14px; color: var(--text2); display: flex; gap: 10px; align-items: flex-start; margin-bottom: 8px; }
+.hint-card b { color: var(--text); }
+.hint-card button { color: var(--text3); font-size: 20px; line-height: 1; margin-left: auto; }
+
+/* Week */
+.wnav { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; }
+.wnav button { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: var(--accent); background: var(--fill); }
+.wnav .today { width: auto; padding: 0 12px; border-radius: 999px; font-size: 15px; font-weight: 600; margin-left: auto; }
+.wtotal { margin: 14px 0 22px; }
+.wtotal .n { font-size: 44px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.wtotal .n span { font-size: 20px; color: var(--text2); font-weight: 600; }
+.bar { height: 8px; background: var(--fill); border-radius: 4px; overflow: hidden; margin: 8px 0 8px; }
+.bar i { display: block; height: 100%; background: var(--accent); border-radius: 4px; transition: width .4s; }
+.wtotal .s { font-size: 15px; color: var(--text2); }
+.group { background: var(--card); border-radius: 14px; overflow: hidden; }
+.gtitle { font-size: 13px; color: var(--text2); text-transform: uppercase; letter-spacing: .02em; margin: 22px 16px 7px; }
+.gfoot { font-size: 13px; color: var(--text2); margin: 7px 16px 0; }
+.li { display: flex; align-items: center; gap: 12px; padding: 12px 16px; width: 100%; text-align: left; position: relative; min-height: 52px; }
+.li + .li::before { content: ""; position: absolute; top: 0; left: 16px; right: 0; border-top: .5px solid var(--sep); }
+button.li:active { background: var(--fill); }
+.li .day { width: 44px; flex: none; }
+.li .day b { display: block; font-size: 17px; }
+.li .day small { font-size: 13px; color: var(--text2); }
+.li .mid { flex: 1; min-width: 0; font-size: 14px; color: var(--text2); }
+.li .mid .chip { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; color: var(--m); }
+.li .mid .chip svg { width: 16px; height: 16px; }
+.li .hrs { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.li .hrs.none { color: var(--text3); font-weight: 400; font-size: 17px; }
+.li.istoday .day b { color: var(--accent); }
+.chev { color: var(--text3); width: 16px; height: 16px; }
+.m-ocala { --m: var(--ocala); } .m-orlando { --m: var(--orlando); } .m-home { --m: var(--home); }
+
+/* Settings */
+.set .li { justify-content: space-between; }
+.set .lbl { flex: 1; }
+.set .lbl small { display: block; font-size: 13px; color: var(--text2); }
+.stepper { display: flex; align-items: center; gap: 2px; background: var(--fill); border-radius: 9px; }
+.stepper button { width: 40px; height: 32px; font-size: 20px; font-weight: 500; }
+.stepper b { min-width: 52px; text-align: center; font-variant-numeric: tabular-nums; font-size: 16px; }
+.switch { appearance: none; -webkit-appearance: none; width: 51px; height: 31px; border-radius: 16px; background: var(--fill2); position: relative; transition: background .2s; margin: 0; flex: none; }
+.switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.2); transition: transform .2s; }
+.switch:checked { background: var(--home); }
+.switch:checked::after { transform: translateX(20px); }
+.set button.li { color: var(--accent); }
+.set button.li.red { color: var(--red); }
+
+/* Tab bar */
+.tabbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 10;
+  display: flex; padding: 6px 8px calc(env(safe-area-inset-bottom) + 4px);
+  background: var(--bar); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px);
+  border-top: .5px solid var(--sep);
+}
+.tabbar button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10px; font-weight: 500; color: var(--text2); padding: 2px 0; }
+.tabbar button svg { width: 26px; height: 26px; }
+.tabbar button.on { color: var(--accent); }
+
+/* Sheet */
+.backdrop { position: fixed; inset: 0; z-index: 20; background: rgba(0,0,0,.4); opacity: 0; pointer-events: none; transition: opacity .25s; }
+.backdrop.open { opacity: 1; pointer-events: auto; }
+.sheet {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 21; max-height: calc(100% - env(safe-area-inset-top) - 20px);
+  background: var(--bg); border-radius: 14px 14px 0 0; overflow-y: auto; overscroll-behavior: contain;
+  padding: 0 16px calc(env(safe-area-inset-bottom) + 20px);
+  transform: translateY(105%); transition: transform .32s cubic-bezier(.2,.9,.25,1);
+}
+.sheet.open { transform: none; }
+.grab { width: 36px; height: 5px; border-radius: 3px; background: var(--fill2); margin: 6px auto 0; }
+.snav { display: flex; align-items: center; justify-content: space-between; height: 50px; position: sticky; top: 0; background: var(--bg); z-index: 1; }
+.snav b { font-size: 17px; }
+.snav button { color: var(--accent); font-size: 17px; padding: 8px 0; min-width: 64px; text-align: left; }
+.snav button:last-child { text-align: right; }
+.snav button.strong { font-weight: 600; }
+.bigtime {
+  display: block; width: 100%; height: 72px; margin: 10px 0 16px; border: 0; border-radius: 14px;
+  background: var(--card); font-size: 34px; font-weight: 600; text-align: center; font-variant-numeric: tabular-nums;
+  -webkit-appearance: none; appearance: none;
+}
+.shint { font-size: 15px; color: var(--text2); margin: 4px 4px 0; }
+.sess { display: flex; align-items: center; gap: 8px; padding: 10px 12px 10px 16px; }
+.sess input[type=time] {
+  flex: 1; min-width: 0; height: 40px; border: 0; border-radius: 9px; background: var(--fill);
+  text-align: center; font-size: 17px; font-variant-numeric: tabular-nums; -webkit-appearance: none; appearance: none;
+}
+.sess .to { color: var(--text3); }
+.sess .run { flex: 1; text-align: center; color: var(--accent); font-weight: 600; font-size: 15px; }
+.sess .del { width: 36px; height: 36px; display: grid; place-items: center; color: var(--red); }
+.sess + .sess { border-top: .5px solid var(--sep); }
+.stot { text-align: center; font-size: 15px; color: var(--text2); margin: 14px 0 0; }
+.stot b { color: var(--text); font-size: 22px; }
+
+/* Toast */
+.toast {
+  position: fixed; left: 50%; top: calc(env(safe-area-inset-top) + 8px); z-index: 30;
+  transform: translate(-50%, -140%); transition: transform .3s cubic-bezier(.2,.9,.25,1);
+  background: var(--card); color: var(--text); padding: 12px 18px; border-radius: 999px; font-size: 15px; font-weight: 600;
+  box-shadow: 0 8px 30px rgba(0,0,0,.18); white-space: nowrap; max-width: calc(100% - 32px); overflow: hidden; text-overflow: ellipsis;
+}
+.toast.show { transform: translate(-50%, 0); }
+</style>
+</head>
+<body data-mode="ocala">
+
+<main class="view active" id="view-today">
+  <div id="t-hint"></div>
+  <div id="t-head"></div>
+  <div id="t-mode"></div>
+  <div id="t-ring"></div>
+  <div id="t-card"></div>
+  <div id="t-actions"></div>
+</main>
+
+<main class="view" id="view-week"></main>
+<main class="view set" id="view-settings"></main>
+
+<nav class="tabbar" id="tabbar"></nav>
+
+<div class="backdrop" id="backdrop" data-act="closeSheet"></div>
+<div class="sheet" id="sheet"><div class="grab"></div><div id="sheet-body"></div></div>
+<div class="toast" id="toast"></div>
+<input type="file" id="restoreInput" accept="application/json,.json" hidden>
+
+<script>
+'use strict';
+
+/* ---------- Icons ---------- */
+const svg = p => `<svg class="i" viewBox="0 0 24 24">${p}</svg>`;
+const ICON = {
+  ocala: svg('<path d="M5 12l1.6-4.6A2 2 0 0 1 8.5 6h7a2 2 0 0 1 1.9 1.4L19 12"/><rect x="3.5" y="12" width="17" height="5" rx="1.5"/><path d="M6 17v2M18 17v2"/><circle cx="7.5" cy="14.5" r=".5"/><circle cx="16.5" cy="14.5" r=".5"/>'),
+  orlando: svg('<rect x="5" y="3" width="14" height="18" rx="1.5"/><path d="M9 7.5h1.5M13.5 7.5H15M9 11.5h1.5M13.5 11.5H15M10 21v-4h4v4"/>'),
+  home: svg('<path d="M3.5 11.5L12 4.5l8.5 7"/><path d="M5.5 10v10h13V10"/><path d="M10 20v-5.5h4V20"/>'),
+  clock: svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'),
+  cal: svg('<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>'),
+  sliders: svg('<path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/>'),
+  left: svg('<path d="M15 5l-7 7 7 7"/>'),
+  right: svg('<path d="M9 5l7 7-7 7"/>'),
+  flag: svg('<path d="M5 21V4M5 4h11l-2 4 2 4H5"/>'),
+  play: svg('<path d="M7 5l12 7-12 7z"/>'),
+  pause: svg('<path d="M8 5v14M16 5v14"/>'),
+  stop: svg('<rect x="6" y="6" width="12" height="12" rx="2"/>'),
+  trash: svg('<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>'),
+  check: svg('<path d="M5 12.5l4.5 4.5L19 7.5"/>'),
+};
+const MODES = { ocala: 'Ocala', orlando: 'Orlando', home: 'Home' };
+const DOW = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const DOW_LONG = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/* ---------- Storage ---------- */
+const STORE = 'hours.v1';
+const DEFAULTS = { commute: 75, daily: 10, weekly: 40, showFriday: false, lastMode: 'ocala', hintDismissed: false };
+let S = load();
+function load() {
+  let d;
+  try { d = JSON.parse(localStorage.getItem(STORE)); } catch (e) {}
+  if (!d || typeof d !== 'object' || !d.days) d = { days: {} };
+  d.settings = Object.assign({}, DEFAULTS, d.settings || {});
+  return d;
+}
+function save() { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) {} }
+try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
+
+/* ---------- Time helpers ---------- */
+const MIN = 6e4;
+const pad = n => String(n).padStart(2, '0');
+const keyOf = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const dateOf = k => { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); };
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const mondayOf = d => addDays(new Date(d.getFullYear(), d.getMonth(), d.getDate()), -((d.getDay() + 6) % 7));
+const weekKeys = d => { const m = mondayOf(d); return [0, 1, 2, 3, 4, 5, 6].map(i => keyOf(addDays(m, i))); };
+const fmtT = ms => new Date(ms).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+const hhmm = ms => { const d = new Date(ms); return pad(d.getHours()) + ':' + pad(d.getMinutes()); };
+const atTime = (k, v) => { const [h, m] = v.split(':').map(Number); const d = dateOf(k); d.setHours(h, m, 0, 0); return d.getTime(); };
+const roundH = min => Math.round(min / 6) / 10;          // nearest 0.1 hr (6-minute steps)
+const fmtH = h => (Math.round(h * 10) / 10).toFixed(1);
+const fmtDur = min => { min = Math.max(0, Math.round(min)); return Math.floor(min / 60) + ':' + pad(min % 60); };
+const fmtCommute = min => { const h = Math.floor(min / 60), m = min % 60; return h ? `${h}:${pad(m)}` : `${m} min`; };
+
+/* ---------- Day model ----------
+   days[YYYY-MM-DD] = { mode, closed, sessions: [{ start, end|null }] }
+   Pause ends the current session; resume starts a new one. */
+function worked(day, now) {
+  if (!day) return 0;
+  return day.sessions.reduce((a, s) => a + Math.max(0, (s.end == null ? now : s.end) - s.start) / MIN, 0);
+}
+function status(day) {
+  if (!day || !day.sessions.length) return 'out';
+  if (day.sessions[day.sessions.length - 1].end == null) return 'in';
+  return day.closed ? 'done' : 'paused';
+}
+const dayH = (k, now) => roundH(worked(S.days[k], now));
+const weekTotal = (d, now) => Math.round(weekKeys(d).reduce((a, k) => a + dayH(k, now), 0) * 10) / 10;
+
+// Today, unless a shift that started yesterday is still running past midnight.
+function activeKey(now) {
+  const y = keyOf(addDays(new Date(now), -1));
+  return status(S.days[y]) === 'in' ? y : keyOf(new Date(now));
+}
+
+// Mon–Wed: aim for the daily target. Thu onward: aim for the weekly total.
+function target(k, now) {
+  const d = dateOf(k), dow = d.getDay(), set = S.settings;
+  const weekly = dow === 0 || dow >= 4;
+  const w = worked(S.days[k], now);
+  let need, label;
+  if (weekly) {
+    const prior = weekKeys(d).filter(x => x < k).reduce((a, x) => a + dayH(x, now), 0);
+    need = (set.weekly - prior) * 60;
+    label = `${fmtH(set.weekly)} hrs this week`;
+  } else {
+    need = set.daily * 60;
+    label = `${fmtH(set.daily)} hrs today`;
+  }
+  return { weekly, need, label, worked: w, remaining: need - w };
+}
+
+function ensureDay(k) {
+  if (!S.days[k]) S.days[k] = { mode: S.settings.lastMode, closed: false, sessions: [] };
+  return S.days[k];
+}
+
+/* ---------- Haptics (iOS 18+ switch trick; vibrate elsewhere) ---------- */
+const hapticEl = (() => {
+  const l = document.createElement('label'), i = document.createElement('input');
+  i.type = 'checkbox'; i.setAttribute('switch', ''); l.appendChild(i); l.style.display = 'none';
+  document.body.appendChild(l); return l;
+})();
+function haptic() { try { if (navigator.vibrate) navigator.vibrate(12); else hapticEl.click(); } catch (e) {} }
+
+let toastTimer;
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+/* ---------- Rendering ---------- */
+const $ = s => document.querySelector(s);
+function setHTML(el, h) { if (el._h !== h) { el.innerHTML = h; el._h = h; } } // avoid swallowing taps on re-render
+
+function segHTML(mode, act) {
+  return `<div class="seg">${Object.keys(MODES).map(m =>
+    `<button class="${m === mode ? 'on' : ''}" data-act="${act}" data-m="${m}">${ICON[m]}${MODES[m]}</button>`).join('')}</div>`;
+}
+
+function renderToday() {
+  const now = Date.now(), set = S.settings, k = activeKey(now), day = S.days[k], st = status(day);
+  const mode = (day && day.mode) || set.lastMode;
+  document.body.dataset.mode = mode;
+  const d = dateOf(k), t = target(k, now), w = t.worked;
+  const standalone = navigator.standalone || matchMedia('(display-mode: standalone)').matches;
+
+  setHTML($('#t-hint'), !standalone && !set.hintDismissed && /iPhone|iPad|iPod/.test(navigator.userAgent)
+    ? `<div class="hint-card"><div><b>Install for full screen:</b> tap Share, then <b>Add to Home Screen</b>.</div><button data-act="dismissHint" aria-label="Dismiss">×</button></div>` : '');
+
+  setHTML($('#t-head'), `<div class="eyebrow">${DOW_LONG[d.getDay()]}</div>
+    <div class="hrow"><h1>${MON[d.getMonth()]} ${d.getDate()}</h1>
+    <button class="pill" data-act="tab" data-v="week">Week ${fmtH(weekTotal(d, now))}<span> / ${fmtH(set.weekly)}</span></button></div>`);
+
+  setHTML($('#t-mode'), segHTML(mode, 'mode'));
+
+  // Ring
+  const C = 2 * Math.PI * 104;
+  const p = t.need > 0 ? Math.min(1, w / t.need) : 1;
+  const sessions = day ? day.sessions : [];
+  const last = sessions[sessions.length - 1];
+  let statusTxt = 'Not clocked in', dot = '';
+  if (st === 'in') { statusTxt = `On the clock since ${fmtT(sessions[0].start)}`; dot = 'live'; }
+  else if (st === 'paused') { statusTxt = `Paused at ${fmtT(last.end)}`; dot = 'paused'; }
+  else if (st === 'done') statusTxt = last.end > now ? `Clock-out set for ${fmtT(last.end)} (estimate)` : `Clocked out at ${fmtT(last.end)}`;
+  setHTML($('#t-ring'), `<div class="ringwrap">
+      <svg class="ring" viewBox="0 0 240 240"><circle class="track" cx="120" cy="120" r="104"/>
+      <circle class="prog" cx="120" cy="120" r="104" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C * (1 - p)).toFixed(1)}" transform="rotate(-90 120 120)"/></svg>
+      <div class="ring-c"><div class="big">${fmtH(roundH(w))}</div><div class="unit">hours</div><div class="sub">${fmtDur(w)} worked</div></div>
+    </div><div class="status"><span class="dot ${dot}"></span>${statusTxt}</div>`);
+
+  setHTML($('#t-card'), targetCard(mode, st, t, now));
+  setHTML($('#t-actions'), actionsHTML(mode, st, last, now));
+}
+
+function targetCard(mode, st, t, now) {
+  const set = S.settings;
+  const card = (icon, k, big, sub, cls = '') =>
+    `<div class="card tcard ${cls}"><div class="ic">${icon}</div><div><div class="k">${k}</div><div class="t">${big}</div><div class="s">${sub}</div></div></div>`;
+  const toGo = t.worked > 0 || t.weekly ? ` · ${fmtH(roundH(t.remaining))} hrs to go` : '';
+
+  if (t.remaining <= 0 && st !== 'out')
+    return card(ICON.check, 'Target reached', roundH(-t.remaining) > 0 ? `+${fmtH(roundH(-t.remaining))} hrs extra` : 'Right on target',`${t.label} done${mode === 'ocala' && st === 'in' ? ' · head home whenever' : ''}`);
+  if (t.remaining <= 0)
+    return card(ICON.check, 'Target reached', `${t.label}`, 'Anything today is extra');
+
+  if (st === 'done')
+    return card(ICON.flag, 'Short of target', `${fmtH(roundH(t.remaining))} hrs short`, t.weekly ? `of ${t.label} · add a Friday?` : `of ${t.label}`, 'warn');
+
+  const finish = now + t.remaining * MIN;
+  const prefix = st === 'in' ? '' : st === 'paused' ? 'If you resume now · ' : 'If you start now · ';
+  if (mode === 'ocala') {
+    const leave = finish - set.commute * MIN;
+    if (st === 'in' && leave <= now)
+      return card(ICON.ocala, 'Leave Ocala', 'Now', `You'll hit ${t.label} at ${fmtT(finish)} on the drive`);
+    return card(ICON.ocala, prefix + 'Leave Ocala by', fmtT(leave), `Home ~${fmtT(finish)} · ${t.label}${toGo}`);
+  }
+  const kicker = mode === 'orlando' ? 'Leave the office at' : 'Clock out at';
+  return card(ICON[mode], prefix + kicker, fmtT(finish), `for ${t.label}${toGo}`);
+}
+
+function actionsHTML(mode, st, last, now) {
+  const set = S.settings;
+  if (st === 'out') return `<div class="actions">
+      <button class="btn primary xl" data-act="clockIn">${ICON.play}Clock In</button>
+      <button class="btn gray" data-act="startEarlier">Started earlier…</button></div>`;
+  if (st === 'in') return `<div class="actions">
+      <div class="row2"><button class="btn gray" data-act="pause">${ICON.pause}Pause</button>
+      <button class="btn primary" data-act="clockOut">${ICON.stop}${mode === 'ocala' ? "I'm Home" : 'Clock Out'}</button></div>
+      ${mode === 'ocala' ? `<button class="btn tinted" data-act="lazy">Leaving now <small>· clock out at ${fmtT(now + set.commute * MIN)}</small></button>` : ''}
+      <button class="link" data-act="editToday">Edit today's times</button></div>`;
+  if (st === 'paused') return `<div class="actions">
+      <div class="row2"><button class="btn primary" data-act="resume">${ICON.play}Resume</button>
+      <button class="btn gray" data-act="clockOut">${ICON.stop}Clock Out</button></div>
+      <button class="link" data-act="editToday">Edit today's times</button></div>`;
+  return `<div class="actions">
+      ${last.end > now ? `<button class="btn tinted" data-act="homeNow">I'm home now · use ${fmtT(now)}</button>` : ''}
+      <button class="btn gray" data-act="reopen">${ICON.play}Clock back in</button>
+      <button class="link" data-act="editToday">Edit today's times</button></div>`;
+}
+
+let weekOffset = 0;
+function renderWeek() {
+  const now = Date.now(), set = S.settings;
+  const ref = addDays(new Date(), weekOffset * 7), keys = weekKeys(ref), todayK = keyOf(new Date());
+  const mon = dateOf(keys[0]), thu = dateOf(keys[3]);
+  const total = weekTotal(ref, now);
+  const title = weekOffset === 0 ? 'This Week' : weekOffset === -1 ? 'Last Week' : `${MON[mon.getMonth()]} ${mon.getDate()}`;
+  const diff = Math.round((total - set.weekly) * 10) / 10;
+  const shown = keys.filter((k, i) => i < 4 || (i === 4 && set.showFriday) || (S.days[k] && S.days[k].sessions.length));
+
+  const rows = shown.map(k => {
+    const d = dateOf(k), day = S.days[k], st = status(day), has = day && day.sessions.length;
+    let mid = '';
+    if (has) {
+      const s = day.sessions, first = s[0].start, last = s[s.length - 1].end;
+      const breaks = s.length - 1;
+      mid = `<span class="chip m-${day.mode}">${ICON[day.mode]}${MODES[day.mode]}</span><br>
+        ${fmtT(first)} – ${last == null ? 'now' : fmtT(last)}${breaks ? ` · ${breaks} pause${breaks > 1 ? 's' : ''}` : ''}${st === 'paused' ? ' · paused' : ''}`;
+    } else mid = k > todayK ? '' : '<span style="color:var(--text3)">No time logged</span>';
+    return `<button class="li ${k === todayK ? 'istoday' : ''}" data-act="editDay" data-k="${k}">
+      <div class="day"><b>${DOW[d.getDay()]}</b><small>${MON[d.getMonth()]} ${d.getDate()}</small></div>
+      <div class="mid">${mid}</div>
+      <div class="hrs ${has ? '' : 'none'}">${has ? fmtH(dayH(k, now)) : '—'}</div>
+      <svg class="i chev" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>`;
+  }).join('');
+
+  setHTML($('#view-week'), `
+    <div class="wnav"><button data-act="weekPrev" aria-label="Previous week">${ICON.left}</button>
+      <button data-act="weekNext" aria-label="Next week">${ICON.right}</button>
+      ${weekOffset ? '<button class="today" data-act="weekNow">This week</button>' : ''}</div>
+    <div class="eyebrow">${MON[mon.getMonth()]} ${mon.getDate()} – ${MON[thu.getMonth()]} ${thu.getDate()}</div>
+    <h1>${title}</h1>
+    <div class="card wtotal"><div class="n">${fmtH(total)}<span> / ${fmtH(set.weekly)} hrs</span></div>
+      <div class="bar"><i style="width:${Math.min(100, total / set.weekly * 100)}%"></i></div>
+      <div class="s">${diff >= 0 ? `Goal met${diff > 0 ? ` · +${fmtH(diff)} extra` : ''}` : `${fmtH(-diff)} hrs to go`}</div></div>
+    <div class="group">${rows}</div>
+    <div class="gfoot">Each day is rounded to the nearest 0.1 hr. Tap a day to edit or add time.</div>`);
+}
+
+function renderSettings() {
+  const s = S.settings;
+  const stepper = (key, val) => `<div class="stepper"><button data-act="step" data-k="${key}" data-d="-1">−</button><b>${val}</b><button data-act="step" data-k="${key}" data-d="1">+</button></div>`;
+  setHTML($('#view-settings'), `
+    <h1 style="margin-top:28px">Settings</h1>
+    <div class="gtitle">Targets</div>
+    <div class="group">
+      <div class="li"><div class="lbl">Daily target<small>Mon–Wed leave-by time</small></div>${stepper('daily', fmtH(s.daily))}</div>
+      <div class="li"><div class="lbl">Weekly target<small>Thursday onward aims for this</small></div>${stepper('weekly', fmtH(s.weekly))}</div>
+    </div>
+    <div class="gtitle">Ocala</div>
+    <div class="group">
+      <div class="li"><div class="lbl">Drive home<small>Used for "Leave Ocala by" and "Leaving now"</small></div>${stepper('commute', fmtCommute(s.commute))}</div>
+    </div>
+    <div class="gtitle">Week</div>
+    <div class="group">
+      <div class="li"><div class="lbl">Show Friday<small>Fridays with time logged always show</small></div><input type="checkbox" class="switch" id="friToggle" ${s.showFriday ? 'checked' : ''}></div>
+    </div>
+    <div class="gtitle">Your data</div>
+    <div class="group">
+      <button class="li" data-act="exportCsv">Export timesheet (CSV)</button>
+      <button class="li" data-act="backup">Back up all data</button>
+      <button class="li" data-act="restore">Restore from backup…</button>
+      <button class="li red" data-act="erase">Erase all data</button>
+    </div>
+    <div class="gfoot">Everything is stored only on this iPhone. Back up now and then.</div>`);
+}
+
+function renderTabs(active) {
+  const tabs = [['today', 'Today', ICON.clock], ['week', 'Week', ICON.cal], ['settings', 'Settings', ICON.sliders]];
+  setHTML($('#tabbar'), tabs.map(([v, l, ic]) =>
+    `<button class="${v === active ? 'on' : ''}" data-act="tab" data-v="${v}">${ic}${l}</button>`).join(''));
+}
+
+let currentTab = 'today';
+function showTab(v) {
+  currentTab = v;
+  document.querySelectorAll('.view').forEach(el => el.classList.toggle('active', el.id === 'view-' + v));
+  renderAll();
+}
+function renderAll() {
+  renderTabs(currentTab);
+  if (currentTab === 'today') renderToday();
+  if (currentTab === 'week') renderWeek();
+  if (currentTab === 'settings') renderSettings();
+  if (sheetKey) renderEditSheet();
+}
+
+/* ---------- Sheets ---------- */
+let sheetKey = null;
+function openSheet(html) {
+  $('#sheet-body').innerHTML = html;
+  $('#sheet').classList.add('open'); $('#backdrop').classList.add('open');
+}
+function closeSheet() {
+  sheetKey = null;
+  $('#sheet').classList.remove('open'); $('#backdrop').classList.remove('open');
+}
+
+function openStartSheet() {
+  sheetKey = null;
+  openSheet(`<div class="snav"><button data-act="closeSheet">Cancel</button><b>Start time</b><button class="strong" data-act="saveStart">Clock In</button></div>
+    <div class="shint">${S.settings.lastMode === 'ocala' ? 'When did you leave home?' : S.settings.lastMode === 'orlando' ? 'When did you get to the office?' : 'When did you start working?'}</div>
+    <input type="time" class="bigtime" id="startInput" value="${hhmm(Date.now())}">`);
+}
+
+function openEditSheet(k) { sheetKey = k; renderEditSheet(true); }
+function renderEditSheet(force) {
+  const k = sheetKey, now = Date.now(), d = dateOf(k), day = S.days[k];
+  const mode = (day && day.mode) || S.settings.lastMode;
+  const sess = day ? day.sessions : [];
+  const rows = sess.map((s, i) => `<div class="sess">
+      <input type="time" value="${hhmm(s.start)}" data-sess="${i}" data-f="start">
+      <span class="to">–</span>
+      ${s.end == null ? '<span class="run">Running</span>' : `<input type="time" value="${hhmm(s.end)}" data-sess="${i}" data-f="end">`}
+      <button class="del" data-act="delSess" data-i="${i}" aria-label="Delete">${ICON.trash}</button></div>`).join('');
+  const html = `<div class="snav"><span style="min-width:64px"></span><b>${DOW[d.getDay()]}, ${MON[d.getMonth()]} ${d.getDate()}</b><button class="strong" data-act="closeSheet">Done</button></div>
+    ${segHTML(mode, 'editMode')}
+    <div class="gtitle">Time blocks</div>
+    <div class="group">${rows || '<div class="li" style="color:var(--text2)">No time logged</div>'}</div>
+    <div class="gfoot">Each pause splits the day into blocks. Ocala days start when you leave home and end when you get back.</div>
+    <div class="actions" style="margin-top:16px">
+      <button class="btn tinted" data-act="addSess">Add time block</button>
+      ${sess.length ? '<button class="btn danger" data-act="delDay">Clear this day</button>' : ''}
+    </div>
+    <div class="stot">Day total <b>${fmtH(dayH(k, now))}</b> hrs <span style="color:var(--text3)">(${fmtDur(worked(day, now))})</span></div>`;
+  const body = $('#sheet-body');
+  if (force || body._h !== html) { body.innerHTML = html; body._h = html; }
+  if (force) { $('#sheet').classList.add('open'); $('#backdrop').classList.add('open'); }
+}
+
+/* ---------- Actions ---------- */
+function commit(msg) { save(); haptic(); renderAll(); if (msg) toast(msg); }
+
+function clockIn(at) {
+  const k = keyOf(new Date(at)), day = ensureDay(k);
+  day.mode = S.settings.lastMode; day.closed = false;
+  day.sessions.push({ start: at, end: null });
+  commit(`Clocked in at ${fmtT(at)}`);
+}
+
+const ACTS = {
+  tab: b => { haptic(); showTab(b.dataset.v); },
+  mode: b => {
+    const m = b.dataset.m, day = S.days[activeKey(Date.now())];
+    S.settings.lastMode = m; if (day) day.mode = m;
+    commit();
+  },
+  clockIn: () => clockIn(Date.now()),
+  startEarlier: () => openStartSheet(),
+  saveStart: () => {
+    const v = $('#startInput').value; if (!v) return;
+    let at = atTime(keyOf(new Date()), v);
+    if (at > Date.now()) at = Date.now();
+    closeSheet(); clockIn(at);
+  },
+  pause: () => {
+    const day = S.days[activeKey(Date.now())];
+    day.sessions[day.sessions.length - 1].end = Date.now();
+    commit('Paused');
+  },
+  resume: () => {
+    const day = S.days[activeKey(Date.now())];
+    day.sessions.push({ start: Date.now(), end: null });
+    commit('Back on the clock');
+  },
+  clockOut: () => {
+    const now = Date.now(), day = S.days[activeKey(now)], last = day.sessions[day.sessions.length - 1];
+    if (last.end == null) last.end = now;
+    day.closed = true;
+    commit(`Clocked out · ${fmtH(roundH(worked(day, now)))} hrs`);
+  },
+  lazy: () => {
+    const now = Date.now(), day = S.days[activeKey(now)];
+    day.sessions[day.sessions.length - 1].end = now + S.settings.commute * MIN;
+    day.closed = true;
+    commit(`Clock-out set for ${fmtT(now + S.settings.commute * MIN)} · ${fmtH(roundH(worked(day, now)))} hrs`);
+  },
+  homeNow: () => {
+    const now = Date.now(), day = S.days[activeKey(now)];
+    day.sessions[day.sessions.length - 1].end = now;
+    commit(`Clocked out at ${fmtT(now)} · ${fmtH(roundH(worked(day, now)))} hrs`);
+  },
+  reopen: () => {
+    const now = Date.now(), day = S.days[activeKey(now)], last = day.sessions[day.sessions.length - 1];
+    if (last.end > now) last.end = now;   // cancel an estimated clock-out
+    day.closed = false;
+    day.sessions.push({ start: now, end: null });
+    commit('Back on the clock');
+  },
+  editToday: () => openEditSheet(activeKey(Date.now())),
+  editDay: b => openEditSheet(b.dataset.k),
+  editMode: b => {
+    const day = ensureDay(sheetKey); day.mode = b.dataset.m;
+    if (sheetKey === activeKey(Date.now())) S.settings.lastMode = b.dataset.m;
+    commit();
+  },
+  addSess: () => {
+    const day = ensureDay(sheetKey), s = day.sessions;
+    const lastEnd = s.length ? s[s.length - 1].end : null;
+    if (s.length && lastEnd == null) return toast('Clock out or pause first');
+    const start = lastEnd ? lastEnd + 30 * MIN : atTime(sheetKey, '07:00');
+    s.push({ start, end: start + (lastEnd ? 60 : 600) * MIN });
+    day.closed = true;
+    commit();
+  },
+  delSess: b => {
+    const day = S.days[sheetKey]; day.sessions.splice(+b.dataset.i, 1);
+    if (!day.sessions.length) delete S.days[sheetKey];
+    commit();
+  },
+  delDay: () => { if (confirm('Clear all time for this day?')) { delete S.days[sheetKey]; commit(); } },
+  closeSheet: () => closeSheet(),
+  weekPrev: () => { weekOffset--; haptic(); renderWeek(); },
+  weekNext: () => { weekOffset++; haptic(); renderWeek(); },
+  weekNow: () => { weekOffset = 0; haptic(); renderWeek(); },
+  step: b => {
+    const s = S.settings, d = +b.dataset.d;
+    if (b.dataset.k === 'daily') s.daily = Math.max(.5, Math.min(24, s.daily + d * .5));
+    if (b.dataset.k === 'weekly') s.weekly = Math.max(1, Math.min(100, s.weekly + d));
+    if (b.dataset.k === 'commute') s.commute = Math.max(0, Math.min(300, s.commute + d * 5));
+    commit();
+  },
+  dismissHint: () => { S.settings.hintDismissed = true; commit(); },
+  exportCsv: () => {
+    const now = Date.now(), rows = [['Date', 'Day', 'Mode', 'Start', 'End', 'Pauses', 'Hours']];
+    Object.keys(S.days).sort().forEach(k => {
+      const day = S.days[k], s = day.sessions; if (!s.length) return;
+      const last = s[s.length - 1].end;
+      rows.push([k, DOW[dateOf(k).getDay()], MODES[day.mode], fmtT(s[0].start), last == null ? '' : fmtT(last), s.length - 1, fmtH(dayH(k, now))]);
+    });
+    shareFile(`hours-${keyOf(new Date())}.csv`, rows.map(r => r.join(',')).join('\n'), 'text/csv');
+  },
+  backup: () => shareFile(`hours-backup-${keyOf(new Date())}.json`, JSON.stringify(S), 'application/json'),
+  restore: () => $('#restoreInput').click(),
+  erase: () => {
+    if (!confirm('Erase all logged hours and settings? This cannot be undone.')) return;
+    S = { days: {}, settings: Object.assign({}, DEFAULTS) }; commit('All data erased');
+  },
+};
+
+async function shareFile(name, text, type) {
+  const file = new File([text], name, { type });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file] }); } catch (e) {}
+    return;
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(file); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+}
+
+/* ---------- Events ---------- */
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-act]');
+  if (b && ACTS[b.dataset.act]) ACTS[b.dataset.act](b, e);
+});
+
+document.addEventListener('change', e => {
+  const el = e.target;
+  if (el.id === 'friToggle') { S.settings.showFriday = el.checked; commit(); return; }
+  if (el.dataset.sess != null && el.value) {
+    const day = S.days[sheetKey], s = day.sessions[+el.dataset.sess];
+    const ms = atTime(sheetKey, el.value);
+    if (el.dataset.f === 'start') s.start = ms;
+    else s.end = ms < s.start ? ms + 864e5 : ms;   // an end before the start means past midnight
+    day.sessions.sort((a, b) => a.start - b.start);
+    commit();
+  }
+});
+
+$('#restoreInput').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  try {
+    const d = JSON.parse(await f.text());
+    if (!d || typeof d.days !== 'object') throw new Error('bad file');
+    if (!confirm(`Replace everything on this phone with the backup (${Object.keys(d.days).length} days)?`)) return;
+    d.settings = Object.assign({}, DEFAULTS, d.settings || {});
+    S = d; commit('Backup restored');
+  } catch (err) { alert("That file isn't an Hours backup."); }
+});
+
+// Swipe the sheet down to dismiss.
+(() => {
+  const sh = $('#sheet'); let y0 = null, dy = 0;
+  sh.addEventListener('touchstart', e => { if (sh.scrollTop <= 0) { y0 = e.touches[0].clientY; dy = 0; } }, { passive: true });
+  sh.addEventListener('touchmove', e => {
+    if (y0 == null) return; dy = e.touches[0].clientY - y0;
+    if (dy > 0) { sh.style.transition = 'none'; sh.style.transform = `translateY(${dy}px)`; }
+  }, { passive: true });
+  sh.addEventListener('touchend', () => {
+    if (y0 == null) return;
+    sh.style.transition = ''; sh.style.transform = '';
+    if (dy > 100) closeSheet();
+    y0 = null;
+  });
+})();
+
+document.addEventListener('visibilitychange', () => { if (!document.hidden) renderAll(); });
+setInterval(() => { if (!document.hidden) renderAll(); }, 10000);
+
+if ('serviceWorker' in navigator && location.protocol.startsWith('http'))
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+
+renderAll();
+</script>
+</body>
+</html>
