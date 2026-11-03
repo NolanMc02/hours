@@ -1,5 +1,5 @@
 // Offline support: serve from cache instantly, refresh the cache in the background.
-const CACHE = 'hours-v1';
+const CACHE = 'hours-v2';
 const ASSETS = ['./', './index.html', './manifest.webmanifest',
   './icons/icon-180.png', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png'];
 
