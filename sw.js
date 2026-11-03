@@ -1,6 +1,6 @@
 // Offline support: always try the network first (bypassing the browser's HTTP cache, since
 // GitHub Pages sends max-age=600), and fall back to the saved copy only when offline.
-const CACHE = 'hours-v3';
+const CACHE = 'hours-v4';
 const ASSETS = ['./', './index.html', './manifest.webmanifest',
   './icons/icon-180.png', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png'];
 
