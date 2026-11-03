@@ -838,8 +838,17 @@ $('#restoreInput').addEventListener('change', async e => {
 document.addEventListener('visibilitychange', () => { if (!document.hidden) renderAll(); });
 setInterval(() => { if (!document.hidden) renderAll(); }, 10000);
 
-if ('serviceWorker' in navigator && location.protocol.startsWith('http'))
-  navigator.serviceWorker.register('sw.js').catch(() => {});
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  // When a newer version takes over, reload once so it shows right away.
+  const hadController = !!navigator.serviceWorker.controller;
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (hadController && !reloaded) { reloaded = true; location.reload(); }
+  });
+  navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+    .then(r => { r.update(); document.addEventListener('visibilitychange', () => { if (!document.hidden) r.update(); }); })
+    .catch(() => {});
+}
 
 /* ---------- Appearance ---------- */
 const isStandalone = () => navigator.standalone || matchMedia('(display-mode: standalone)').matches;
