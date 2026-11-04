@@ -32,6 +32,7 @@
   --bar: rgba(249,249,249,.8);
   --ocala: #FF9500; --orlando: #007AFF; --home: #34C759; --red: #FF3B30;
   --accent: var(--ocala);
+  --ts: 1;
   --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
   color-scheme: light;
 }
@@ -74,7 +75,7 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: var(--bg); c
 }
 body {
   position: relative; overscroll-behavior: none;
-  font: 17px/1.3 var(--font);
+  font-family: var(--font); font-size: calc(17px * var(--ts)); line-height: 1.3;
   -webkit-font-smoothing: antialiased; -webkit-text-size-adjust: 100%;
   -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
 }
@@ -86,16 +87,16 @@ svg.i { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-widt
 .view {
   position: absolute; inset: 0; display: none;
   overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
-  padding: calc(env(safe-area-inset-top) + 10px) 16px calc(env(safe-area-inset-bottom) + 92px);
+  padding: calc(env(safe-area-inset-top) + 10px) 16px calc(env(safe-area-inset-bottom) + 92px * var(--ts));
 }
 .view.active { display: block; animation: fade .18s ease-out; }
 @keyframes fade { from { opacity: .4; } to { opacity: 1; } }
 
-.eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .02em; text-transform: uppercase; color: var(--text2); }
-h1 { font-size: 34px; font-weight: 700; letter-spacing: -.02em; margin: 2px 0 0; }
+.eyebrow { font-size: calc(13px * var(--ts)); font-weight: 600; letter-spacing: .02em; text-transform: uppercase; color: var(--text2); }
+h1 { font-size: calc(34px * var(--ts)); font-weight: 700; letter-spacing: -.02em; margin: 2px 0 0; }
 .hrow { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
 .pill {
-  background: var(--fill); border-radius: 999px; padding: 7px 12px; font-size: 15px; font-weight: 600;
+  background: var(--fill); border-radius: 999px; padding: 7px 12px; font-size: calc(15px * var(--ts)); font-weight: 600;
   white-space: nowrap; margin-bottom: 4px;
 }
 .pill span { color: var(--text2); font-weight: 500; }
@@ -104,7 +105,7 @@ h1 { font-size: 34px; font-weight: 700; letter-spacing: -.02em; margin: 2px 0 0;
 .seg { display: flex; background: var(--fill); border-radius: 12px; padding: 3px; gap: 3px; margin: 16px 0 6px; }
 .seg button {
   flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
-  height: 40px; border-radius: 9px; font-size: 15px; font-weight: 600; color: var(--text2);
+  min-height: 40px; border-radius: 9px; font-size: calc(15px * var(--ts)); font-weight: 600; color: var(--text2);
   transition: background .2s, color .2s;
 }
 .seg button svg { width: 20px; height: 20px; }
@@ -121,10 +122,10 @@ h1 { font-size: 34px; font-weight: 700; letter-spacing: -.02em; margin: 2px 0 0;
 .ring .track { stroke: var(--fill); }
 .ring .prog { stroke: var(--accent); stroke-linecap: round; transition: stroke-dashoffset .6s ease, stroke .3s; }
 .ring-c { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.ring-c .big { font-size: 64px; font-weight: 700; letter-spacing: -.03em; line-height: 1; font-variant-numeric: tabular-nums; }
-.ring-c .unit { font-size: 15px; color: var(--text2); font-weight: 600; margin-top: 4px; }
-.ring-c .sub { font-size: 13px; color: var(--text3); margin-top: 6px; font-variant-numeric: tabular-nums; }
-.status { text-align: center; font-size: 15px; color: var(--text2); display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 22px; }
+.ring-c .big { font-size: calc(64px * min(var(--ts), 1.25)); font-weight: 700; letter-spacing: -.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+.ring-c .unit { font-size: calc(15px * var(--ts)); color: var(--text2); font-weight: 600; margin-top: 4px; }
+.ring-c .sub { font-size: calc(13px * var(--ts)); color: var(--text3); margin-top: 6px; font-variant-numeric: tabular-nums; }
+.status { text-align: center; font-size: calc(15px * var(--ts)); color: var(--text2); display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 22px; }
 .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text3); }
 .dot.live { background: var(--accent); animation: pulse 1.6s infinite; }
 .dot.paused { background: var(--ocala); }
@@ -134,16 +135,16 @@ h1 { font-size: 34px; font-weight: 700; letter-spacing: -.02em; margin: 2px 0 0;
 .card { background: var(--card); border-radius: 16px; padding: 14px 16px; }
 .tcard { margin: 14px 0 14px; display: flex; align-items: center; gap: 14px; }
 .tcard .ic { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; background: var(--accent); color: #fff; flex: none; }
-.tcard .k { font-size: 13px; color: var(--text2); font-weight: 600; }
-.tcard .t { font-size: 28px; font-weight: 700; letter-spacing: -.02em; line-height: 1.15; font-variant-numeric: tabular-nums; }
-.tcard .s { font-size: 13px; color: var(--text2); margin-top: 1px; }
+.tcard .k { font-size: calc(13px * var(--ts)); color: var(--text2); font-weight: 600; }
+.tcard .t { font-size: calc(28px * var(--ts)); font-weight: 700; letter-spacing: -.02em; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.tcard .s { font-size: calc(13px * var(--ts)); color: var(--text2); margin-top: 1px; }
 .tcard.warn .ic { background: var(--red); }
 
 /* Buttons */
 .actions { display: grid; gap: 10px; }
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .btn {
-  height: 56px; border-radius: 16px; font-size: 18px; font-weight: 600;
+  min-height: 56px; border-radius: 16px; font-size: calc(18px * var(--ts)); font-weight: 600;
   display: flex; align-items: center; justify-content: center; gap: 8px;
   transition: transform .12s, opacity .12s;
 }
@@ -152,39 +153,39 @@ h1 { font-size: 34px; font-weight: 700; letter-spacing: -.02em; margin: 2px 0 0;
 .btn.tinted { background: color-mix(in srgb, var(--accent) 16%, transparent); color: var(--accent); }
 .btn.gray { background: var(--fill); color: var(--text); }
 .btn.danger { background: color-mix(in srgb, var(--red) 15%, transparent); color: var(--red); }
-.btn.xl { height: 64px; font-size: 20px; }
-.btn small { font-weight: 500; opacity: .75; font-size: 15px; }
-.link { color: var(--accent); font-size: 15px; font-weight: 500; padding: 10px; text-align: center; }
+.btn.xl { min-height: 64px; font-size: calc(20px * var(--ts)); }
+.btn small { font-weight: 500; opacity: .75; font-size: calc(15px * var(--ts)); }
+.link { color: var(--accent); font-size: calc(15px * var(--ts)); font-weight: 500; padding: 10px; text-align: center; }
 
 /* Install hint */
-.hint-card { background: var(--card); border-radius: 14px; padding: 12px 14px; font-size: 14px; color: var(--text2); display: flex; gap: 10px; align-items: flex-start; margin-bottom: 8px; }
+.hint-card { background: var(--card); border-radius: 14px; padding: 12px 14px; font-size: calc(14px * var(--ts)); color: var(--text2); display: flex; gap: 10px; align-items: flex-start; margin-bottom: 8px; }
 .hint-card b { color: var(--text); }
-.hint-card button { color: var(--text3); font-size: 20px; line-height: 1; margin-left: auto; }
+.hint-card button { color: var(--text3); font-size: calc(20px * var(--ts)); line-height: 1; margin-left: auto; }
 
 /* Week */
 .wnav { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; }
 .wnav button { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; color: var(--accent); background: var(--fill); }
-.wnav .today { width: auto; padding: 0 12px; border-radius: 999px; font-size: 15px; font-weight: 600; margin-left: auto; }
+.wnav .today { width: auto; padding: 0 12px; border-radius: 999px; font-size: calc(15px * var(--ts)); font-weight: 600; margin-left: auto; }
 .wtotal { margin: 14px 0 22px; }
-.wtotal .n { font-size: 44px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
-.wtotal .n span { font-size: 20px; color: var(--text2); font-weight: 600; }
+.wtotal .n { font-size: calc(44px * var(--ts)); font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.wtotal .n span { font-size: calc(20px * var(--ts)); color: var(--text2); font-weight: 600; }
 .bar { height: 8px; background: var(--fill); border-radius: 4px; overflow: hidden; margin: 8px 0 8px; }
 .bar i { display: block; height: 100%; background: var(--accent); border-radius: 4px; transition: width .4s; }
-.wtotal .s { font-size: 15px; color: var(--text2); }
+.wtotal .s { font-size: calc(15px * var(--ts)); color: var(--text2); }
 .group { background: var(--card); border-radius: 14px; overflow: hidden; }
-.gtitle { font-size: 13px; color: var(--text2); text-transform: uppercase; letter-spacing: .02em; margin: 22px 16px 7px; }
-.gfoot { font-size: 13px; color: var(--text2); margin: 7px 16px 0; }
+.gtitle { font-size: calc(13px * var(--ts)); color: var(--text2); text-transform: uppercase; letter-spacing: .02em; margin: 22px 16px 7px; }
+.gfoot { font-size: calc(13px * var(--ts)); color: var(--text2); margin: 7px 16px 0; }
 .li { display: flex; align-items: center; gap: 12px; padding: 12px 16px; width: 100%; text-align: left; position: relative; min-height: 52px; }
 .li + .li::before { content: ""; position: absolute; top: 0; left: 16px; right: 0; border-top: .5px solid var(--sep); }
 button.li:active { background: var(--fill); }
-.li .day { width: 44px; flex: none; }
-.li .day b { display: block; font-size: 17px; }
-.li .day small { font-size: 13px; color: var(--text2); }
-.li .mid { flex: 1; min-width: 0; font-size: 14px; color: var(--text2); }
-.li .mid .chip { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; color: var(--m); }
+.li .day { width: calc(44px * var(--ts)); flex: none; }
+.li .day b { display: block; font-size: calc(17px * var(--ts)); }
+.li .day small { font-size: calc(13px * var(--ts)); color: var(--text2); }
+.li .mid { flex: 1; min-width: 0; font-size: calc(14px * var(--ts)); color: var(--text2); }
+.li .mid .chip { display: inline-flex; align-items: center; gap: 4px; font-size: calc(13px * var(--ts)); font-weight: 600; color: var(--m); }
 .li .mid .chip svg { width: 16px; height: 16px; }
-.li .hrs { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; }
-.li .hrs.none { color: var(--text3); font-weight: 400; font-size: 17px; }
+.li .hrs { font-size: calc(22px * var(--ts)); font-weight: 600; font-variant-numeric: tabular-nums; }
+.li .hrs.none { color: var(--text3); font-weight: 400; font-size: calc(17px * var(--ts)); }
 .li.istoday .day b { color: var(--accent); }
 .chev { color: var(--text3); width: 16px; height: 16px; }
 .m-ocala { --m: var(--ocala); } .m-orlando { --m: var(--orlando); } .m-home { --m: var(--home); }
@@ -192,10 +193,10 @@ button.li:active { background: var(--fill); }
 /* Settings */
 .set .li { justify-content: space-between; }
 .set .lbl { flex: 1; }
-.set .lbl small { display: block; font-size: 13px; color: var(--text2); }
+.set .lbl small { display: block; font-size: calc(13px * var(--ts)); color: var(--text2); }
 .stepper { display: flex; align-items: center; gap: 2px; background: var(--fill); border-radius: 9px; }
-.stepper button { width: 40px; height: 32px; font-size: 20px; font-weight: 500; }
-.stepper b { min-width: 52px; text-align: center; font-variant-numeric: tabular-nums; font-size: 16px; }
+.stepper button { width: 40px; min-height: 32px; font-size: calc(20px * var(--ts)); font-weight: 500; }
+.stepper b { min-width: 52px; text-align: center; font-variant-numeric: tabular-nums; font-size: calc(16px * var(--ts)); }
 .switch { appearance: none; -webkit-appearance: none; width: 51px; height: 31px; border-radius: 16px; background: var(--fill2); position: relative; transition: background .2s; margin: 0; flex: none; }
 .switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 27px; height: 27px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.2); transition: transform .2s; }
 .switch:checked { background: var(--home); }
@@ -210,7 +211,7 @@ button.li:active { background: var(--fill); }
   background: var(--bar); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px);
   border-top: .5px solid var(--sep);
 }
-.tabbar button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10px; font-weight: 500; color: var(--text2); padding: 2px 0; }
+.tabbar button { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: calc(10px * var(--ts)); font-weight: 500; color: var(--text2); padding: 2px 0; }
 .tabbar button svg { width: 26px; height: 26px; }
 .tabbar button.on { color: var(--accent); }
 
@@ -225,50 +226,117 @@ button.li:active { background: var(--fill); }
 }
 .sheet.open { transform: none; }
 .grab { width: 36px; height: 5px; border-radius: 3px; background: var(--fill2); margin: 6px auto 0; }
-.snav { display: flex; align-items: center; justify-content: space-between; height: 50px; position: sticky; top: 0; background: var(--bg); z-index: 1; }
-.snav b { font-size: 17px; }
-.snav button { color: var(--accent); font-size: 17px; padding: 8px 0; min-width: 64px; text-align: left; }
+.snav { display: flex; align-items: center; justify-content: space-between; min-height: 50px; position: sticky; top: 0; background: var(--bg); z-index: 1; }
+.snav b { font-size: calc(17px * var(--ts)); }
+.snav button { color: var(--accent); font-size: calc(17px * var(--ts)); padding: 8px 0; min-width: 64px; text-align: left; }
 .snav button:last-child { text-align: right; }
 .snav button.strong { font-weight: 600; }
 .bigtime {
-  display: block; width: 100%; height: 72px; margin: 10px 0 16px; border: 0; border-radius: 14px;
-  background: var(--card); font-size: 34px; font-weight: 600; text-align: center; font-variant-numeric: tabular-nums;
+  display: block; width: 100%; min-height: 72px; margin: 10px 0 16px; border: 0; border-radius: 14px;
+  background: var(--card); font-size: calc(34px * var(--ts)); font-weight: 600; text-align: center; font-variant-numeric: tabular-nums;
   -webkit-appearance: none; appearance: none;
 }
-.shint { font-size: 15px; color: var(--text2); margin: 4px 4px 0; }
+.shint { font-size: calc(15px * var(--ts)); color: var(--text2); margin: 4px 4px 0; }
 .sess { display: flex; align-items: center; gap: 8px; padding: 10px 12px 10px 16px; }
 .sess input[type=time] {
-  flex: 1; min-width: 0; height: 40px; border: 0; border-radius: 9px; background: var(--fill);
-  text-align: center; font-size: 17px; font-variant-numeric: tabular-nums; -webkit-appearance: none; appearance: none;
+  flex: 1; min-width: 0; min-height: 40px; border: 0; border-radius: 9px; background: var(--fill);
+  text-align: center; font-size: max(16px, calc(17px * var(--ts))); font-variant-numeric: tabular-nums; -webkit-appearance: none; appearance: none;
 }
 .sess .to { color: var(--text3); }
-.sess .run { flex: 1; text-align: center; color: var(--accent); font-weight: 600; font-size: 15px; }
+.sess .run { flex: 1; text-align: center; color: var(--accent); font-weight: 600; font-size: calc(15px * var(--ts)); }
 .sess .del { width: 36px; height: 36px; display: grid; place-items: center; color: var(--red); }
 .sess + .sess { border-top: .5px solid var(--sep); }
-.stot { text-align: center; font-size: 15px; color: var(--text2); margin: 14px 0 0; }
-.stot b { color: var(--text); font-size: 22px; }
+.stot { text-align: center; font-size: calc(15px * var(--ts)); color: var(--text2); margin: 14px 0 0; }
+.stot b { color: var(--text); font-size: calc(22px * var(--ts)); }
 
 /* Toast */
 .toast {
   position: absolute; left: 50%; top: calc(env(safe-area-inset-top) + 8px); z-index: 30;
-  transform: translate(-50%, -140%); transition: transform .3s cubic-bezier(.2,.9,.25,1);
-  background: var(--card); color: var(--text); padding: 12px 18px; border-radius: 999px; font-size: 15px; font-weight: 600;
+  transform: translate(-50%, -140%); opacity: 0; pointer-events: none; transition: transform .3s cubic-bezier(.2,.9,.25,1), opacity .2s;
+  background: var(--card); color: var(--text); padding: 12px 18px; border-radius: 999px; font-size: calc(15px * var(--ts)); font-weight: 600;
   box-shadow: 0 8px 30px rgba(0,0,0,.18); white-space: nowrap; max-width: calc(100% - 32px); overflow: hidden; text-overflow: ellipsis;
 }
-.toast.show { transform: translate(-50%, 0); }
+.toast.show { transform: translate(-50%, 0); opacity: 1; }
 
 /* Appearance settings */
-.optseg { margin: 0; }
-.optseg button { font-size: 14px; }
+.optseg { margin: 0; flex-wrap: wrap; }
+.optseg button { flex: 1 0 auto; padding: 0 12px; font-size: calc(14px * var(--ts)); }
 .apgroup { padding: 12px 12px; }
 .swrow { padding: 12px 0 0 16px; }
 .swrow + .swrow { border-top: .5px solid var(--sep); }
-.swrow .nm { display: flex; align-items: center; gap: 8px; font-size: 16px; color: var(--c); font-weight: 600; }
+.swrow .nm { display: flex; align-items: center; gap: 8px; font-size: calc(16px * var(--ts)); color: var(--c); font-weight: 600; }
 .swrow .nm svg { width: 20px; height: 20px; }
 .swatches { display: flex; flex-wrap: wrap; gap: 12px; padding: 10px 16px 14px 2px; }
 .swatches::-webkit-scrollbar { display: none; }
 .sw { width: 30px; height: 30px; border-radius: 50%; flex: none; background: var(--c); transition: box-shadow .15s; }
 .sw.on { box-shadow: 0 0 0 2.5px var(--card), 0 0 0 5px var(--c); }
+
+/* Large text: drop the segmented-control icons so labels fit */
+:root[data-big] .seg button svg { display: none; }
+:root[data-big] .seg button { min-width: 0; }
+
+/* Sync */
+.sync input[type=text], .sync input[type=password] {
+  width: 100%; min-height: 40px; border: 0; border-radius: 9px; background: var(--fill); padding: 0 12px;
+  font-size: max(16px, calc(17px * var(--ts))); -webkit-user-select: text; user-select: text;
+}
+.sync .help { padding: 12px 16px 4px; font-size: calc(14px * var(--ts)); color: var(--text2); line-height: 1.4; }
+.sync .help a { color: var(--accent); }
+.sync .li.col { flex-direction: column; align-items: stretch; gap: 10px; }
+.syncstat { font-size: calc(13px * var(--ts)); color: var(--text2); }
+.syncstat.err { color: var(--red); }
+
+/* Keyboard + pointer polish */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (hover: hover) {
+  .btn:hover { opacity: .88; }
+  button.li:hover, .tabbar button:hover { background: var(--fill); }
+  .seg button:not(.on):hover, .wnav button:hover, .link:hover { opacity: .75; }
+  .sw:hover { transform: scale(1.12); }
+}
+
+/* Tablet / small desktop: keep the phone layout but centre it */
+@media (min-width: 600px) {
+  .view { padding-left: max(16px, calc((100% - 640px) / 2)); padding-right: max(16px, calc((100% - 640px) / 2)); }
+}
+
+/* Desktop: sidebar navigation, wider content, modal sheets */
+@media (min-width: 900px) {
+  :root { --nav-w: 232px; }
+  body { -webkit-user-select: text; user-select: text; }
+  .tabbar {
+    top: 0; right: auto; width: var(--nav-w); flex-direction: column; gap: 4px;
+    padding: 28px 12px; border-top: 0; border-right: .5px solid var(--sep);
+  }
+  .tabbar::before { content: "Hours"; font-size: calc(28px * var(--ts)); font-weight: 700; letter-spacing: -.02em; padding: 0 12px 18px; }
+  .tabbar button { flex: none; flex-direction: row; gap: 12px; justify-content: flex-start; font-size: calc(16px * var(--ts)); padding: 10px 12px; border-radius: 10px; }
+  .tabbar button svg { width: 24px; height: 24px; }
+  .tabbar button.on { background: var(--fill); }
+  .view {
+    left: var(--nav-w);
+    padding: 48px max(40px, calc((100% - var(--nav-w) - 780px) / 2)) 64px;
+  }
+  h1 { font-size: calc(40px * var(--ts)); }
+  #view-today.active {
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 56px; align-content: start;
+    grid-template-areas: "hint hint" "head head" "mode mode" "ring card" "ring actions";
+  }
+  #t-hint { grid-area: hint; } #t-head { grid-area: head; } #t-mode { grid-area: mode; }
+  #t-ring { grid-area: ring; align-self: start; } #t-card { grid-area: card; } #t-actions { grid-area: actions; }
+  .ringwrap { width: min(300px, 100%); margin-top: 8px; }
+  .tcard { margin-top: 18px; }
+  .sheet {
+    left: 50%; right: auto; top: 50%; bottom: auto; width: min(480px, calc(100% - 48px));
+    max-height: min(760px, calc(100% - 64px)); border-radius: 18px; padding-bottom: 24px;
+    box-shadow: 0 24px 80px rgba(0,0,0,.35);
+    transform: translate(-50%, -47%) scale(.97); opacity: 0; pointer-events: none;
+    transition: transform .22s cubic-bezier(.2,.9,.25,1), opacity .18s;
+  }
+  .sheet.open { transform: translate(-50%, -50%); opacity: 1; pointer-events: auto; }
+  .grab { display: none; }
+  .snav { padding-top: 6px; }
+  .toast { left: calc(50% + var(--nav-w) / 2); }
+}
 </style>
 </head>
 <body data-mode="ocala">
@@ -321,7 +389,8 @@ const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct
 /* ---------- Storage ---------- */
 const STORE = 'hours.v1';
 const DEFAULTS = { commute: 75, daily: 10, weekly: 40, showFriday: false, lastMode: 'ocala', hintDismissed: false,
-  theme: 'system', font: 'default', colors: {} };
+  theme: 'system', font: 'default', colors: {}, textSize: 100 };
+const TEXT_SIZES = [90, 100, 115, 130, 150];
 const THEMES = { system: 'System', light: 'Light', dark: 'Dark', dim: 'Dim' };
 const FONTS = {
   default: ['Default', '-apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif'],
@@ -332,15 +401,36 @@ const FONTS = {
 const SWATCHES = ['#FF9500', '#FFCC00', '#FF3B30', '#FF2D55', '#AF52DE', '#5856D6', '#007AFF',
   '#32ADE6', '#30B0C7', '#00C7BE', '#34C759', '#A2845E', '#8E8E93'];
 const DEFAULT_COLORS = { ocala: '#FF9500', orlando: '#007AFF', home: '#34C759' };
+// Sync bookkeeping: every day carries `mod` (last-changed time); deleted days leave a tombstone in
+// `tomb`; `smod` is when the shared settings last changed. save() works these out by diffing against
+// `snap`, so individual actions don't have to know about sync.
+const SYNC_KEYS = ['commute', 'daily', 'weekly', 'showFriday', 'lastMode'];   // appearance stays per-device
+const daySig = d => JSON.stringify([d.mode, d.closed, d.sessions]);
+const setSig = () => JSON.stringify(SYNC_KEYS.map(k => S.settings[k]));
+let snap = { days: {}, set: '' };
+function resnap() { snap = { days: {}, set: setSig() }; Object.keys(S.days).forEach(k => { snap.days[k] = daySig(S.days[k]); }); }
 let S = load();
+resnap();
 function load() {
   let d;
   try { d = JSON.parse(localStorage.getItem(STORE)); } catch (e) {}
   if (!d || typeof d !== 'object' || !d.days) d = { days: {} };
   d.settings = Object.assign({}, DEFAULTS, d.settings || {});
+  if (!d.tomb || typeof d.tomb !== 'object') d.tomb = {};
+  d.smod = d.smod || 0;
   return d;
 }
-function save() { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) {} }
+function persist() { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) {} }
+function save() {
+  const now = Date.now();
+  Object.keys(S.days).forEach(k => {
+    const sig = daySig(S.days[k]);
+    if (snap.days[k] !== sig) { S.days[k].mod = now; snap.days[k] = sig; delete S.tomb[k]; }
+  });
+  Object.keys(snap.days).forEach(k => { if (!S.days[k]) { S.tomb[k] = now; delete snap.days[k]; } });
+  const ss = setSig(); if (ss !== snap.set) { S.smod = now; snap.set = ss; }
+  persist(); scheduleSync();
+}
 try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch (e) {}
 
 /* ---------- Time helpers ---------- */
@@ -564,10 +654,15 @@ function renderSettings() {
     <div class="group">
       <div class="li"><div class="lbl">Show Friday<small>Fridays with time logged always show</small></div><input type="checkbox" class="switch" id="friToggle" ${s.showFriday ? 'checked' : ''}></div>
     </div>
+    ${syncHTML()}
     <div class="gtitle">Appearance</div>
     <div class="group apgroup">
       <div class="seg optseg">${Object.keys(THEMES).map(v =>
         `<button class="${s.theme === v ? 'on' : ''}" data-act="theme" data-v="${v}">${THEMES[v]}</button>`).join('')}</div>
+    </div>
+    <div class="gtitle">Text size</div>
+    <div class="group">
+      <div class="li"><div class="lbl">Text size<small>This device only</small></div>${stepper('textSize', (TEXT_SIZES.includes(s.textSize) ? s.textSize : 100) + '%')}</div>
     </div>
     <div class="gtitle">Font</div>
     <div class="group apgroup">
@@ -590,7 +685,7 @@ function renderSettings() {
       <button class="li" data-act="restore">Restore from backup…</button>
       <button class="li red" data-act="erase">Erase all data</button>
     </div>
-    <div class="gfoot">Everything is stored only on this iPhone. Back up now and then.</div>`);
+    <div class="gfoot">${sync.token ? 'Hours sync through your private GitHub gist. Theme, font, colors and text size stay on each device. Back up now and then.' : 'Everything is stored only on this device. Turn on sync above, and back up now and then.'}</div>`);
 }
 
 function renderTabs(active) {
@@ -746,6 +841,11 @@ const ACTS = {
     if (b.dataset.k === 'daily') s.daily = Math.max(.5, Math.min(24, s.daily + d * .5));
     if (b.dataset.k === 'weekly') s.weekly = Math.max(1, Math.min(100, s.weekly + d));
     if (b.dataset.k === 'commute') s.commute = Math.max(0, Math.min(300, s.commute + d * 5));
+    if (b.dataset.k === 'textSize') {
+      const i = TEXT_SIZES.includes(s.textSize) ? TEXT_SIZES.indexOf(s.textSize) : 1;
+      s.textSize = TEXT_SIZES[Math.max(0, Math.min(TEXT_SIZES.length - 1, i + d))];
+      applyAppearance();
+    }
     commit();
   },
   dismissHint: () => { S.settings.hintDismissed = true; commit(); },
@@ -761,7 +861,7 @@ const ACTS = {
     applyAppearance(); commit();
   },
   resetLook: () => {
-    Object.assign(S.settings, { theme: 'system', font: 'default', colors: {} });
+    Object.assign(S.settings, { theme: 'system', font: 'default', colors: {}, textSize: 100 });
     applyAppearance(); commit('Appearance reset');
   },
   exportCsv: () => {
@@ -777,7 +877,23 @@ const ACTS = {
   restore: () => $('#restoreInput').click(),
   erase: () => {
     if (!confirm('Erase all logged hours and settings? This cannot be undone.')) return;
-    S = { days: {}, settings: Object.assign({}, DEFAULTS, { colors: {} }) }; applyAppearance(); commit('All data erased');
+    S.days = {}; S.settings = Object.assign({}, DEFAULTS, { colors: {} });   // keeps tombstones so other devices erase too
+    applyAppearance(); commit('All data erased');
+  },
+  syncConnect: () => {
+    const t = ($('#syncToken').value || '').trim();
+    if (!t) return toast('Paste your GitHub token first');
+    sync = { token: t };
+    Object.keys(S.days).forEach(k => { if (!S.days[k].mod) S.days[k].mod = 1; });
+    if (!S.smod) S.smod = 1;
+    persist(); saveSyncCfg();
+    syncState = { text: 'Connecting…', err: false, busy: false, dead: false };
+    renderAll(); syncNow();
+  },
+  syncNow: () => { syncState.dead = false; syncNow(); },
+  syncOff: () => {
+    if (!confirm('Disconnect this device from sync? Your hours stay on this device and in the gist.')) return;
+    sync = {}; saveSyncCfg(); syncState = { text: '', err: false, busy: false }; commit('Sync turned off');
   },
 };
 
@@ -818,8 +934,10 @@ $('#restoreInput').addEventListener('change', async e => {
   try {
     const d = JSON.parse(await f.text());
     if (!d || typeof d.days !== 'object') throw new Error('bad file');
-    if (!confirm(`Replace everything on this phone with the backup (${Object.keys(d.days).length} days)?`)) return;
+    if (!confirm(`Replace everything on this device with the backup (${Object.keys(d.days).length} days)?`)) return;
     d.settings = Object.assign({}, DEFAULTS, d.settings || {});
+    if (!d.tomb || typeof d.tomb !== 'object') d.tomb = {};
+    d.smod = d.smod || 0;
     S = d; applyAppearance(); commit('Backup restored');
   } catch (err) { alert("That file isn't an Hours backup."); }
 });
@@ -827,7 +945,7 @@ $('#restoreInput').addEventListener('change', async e => {
 // Swipe the sheet down to dismiss.
 (() => {
   const sh = $('#sheet'); let y0 = null, dy = 0;
-  sh.addEventListener('touchstart', e => { if (sh.scrollTop <= 0) { y0 = e.touches[0].clientY; dy = 0; } }, { passive: true });
+  sh.addEventListener('touchstart', e => { if (matchMedia('(min-width: 900px)').matches) return; if (sh.scrollTop <= 0) { y0 = e.touches[0].clientY; dy = 0; } }, { passive: true });
   sh.addEventListener('touchmove', e => {
     if (y0 == null) return; dy = e.touches[0].clientY - y0;
     if (dy > 0) { sh.style.transition = 'none'; sh.style.transform = `translateY(${dy}px)`; }
@@ -840,8 +958,24 @@ $('#restoreInput').addEventListener('change', async e => {
   });
 })();
 
-document.addEventListener('visibilitychange', () => { if (!document.hidden) renderAll(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && $('#sheet').classList.contains('open')) closeSheet();
+  if (e.key === 'Enter' && e.target.id === 'syncToken') ACTS.syncConnect();
+});
+
+// Another tab of this site changed the data: pick it up instead of overwriting it later.
+window.addEventListener('storage', e => {
+  if (e.key === STORE && e.newValue) { S = load(); resnap(); applyAppearance(); renderAll(); }
+  if (e.key === SYNC_STORE) { sync = loadSyncCfg(); renderAll(); }
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) { renderAll(); syncNow(); }
+  else if (syncTimer) { clearTimeout(syncTimer); syncTimer = null; syncNow(); }   // flush a pending push
+});
+window.addEventListener('online', () => syncNow());
 setInterval(() => { if (!document.hidden) renderAll(); }, 10000);
+setInterval(() => { if (!document.hidden) syncNow(); }, 60000);
 
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   // When a newer version takes over, reload once so it shows right away.
@@ -855,6 +989,128 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
     .catch(() => {});
 }
 
+/* ---------- Sync (private GitHub gist) ----------
+   One JSON file in a secret gist holds all days. Each device merges what it finds with what it has
+   (newest change per day wins, deletions are tombstones), then writes the result back. */
+const SYNC_STORE = 'hours.sync', SYNC_FILE = 'hours-sync.json';
+const loadSyncCfg = () => { try { return JSON.parse(localStorage.getItem(SYNC_STORE)) || {}; } catch (e) { return {}; } };
+let sync = loadSyncCfg();                     // { token, gist, last }
+let syncState = { text: '', err: false, busy: false, dead: false };
+let syncTimer = null, syncAgain = false;
+function saveSyncCfg() { try { localStorage.setItem(SYNC_STORE, JSON.stringify(sync)); } catch (e) {} }
+
+const sortKeys = o => Object.keys(o || {}).sort().reduce((a, k) => (a[k] = o[k], a), {});
+const canonDay = d => ({ mode: d.mode, closed: !!d.closed, sessions: (d.sessions || []).map(x => ({ start: x.start, end: x.end == null ? null : x.end })), mod: d.mod || 0 });
+function pack(d) {
+  const days = {}; Object.keys(d.days || {}).sort().forEach(k => { days[k] = canonDay(d.days[k]); });
+  const settings = {}; SYNC_KEYS.forEach(k => { if (d.settings && d.settings[k] !== undefined) settings[k] = d.settings[k]; });
+  return JSON.stringify({ v: 1, smod: d.smod || 0, settings, tomb: sortKeys(d.tomb), days });
+}
+
+function mergeData(a, r) {
+  const ad = a.days || {}, rd = r.days || {}, at = a.tomb || {}, rt = r.tomb || {};
+  const out = { days: {}, tomb: {}, smod: Math.max(a.smod || 0, r.smod || 0), settings: {} };
+  new Set([...Object.keys(ad), ...Object.keys(rd), ...Object.keys(at), ...Object.keys(rt)]).forEach(k => {
+    const l = ad[k], x = rd[k], t = Math.max(at[k] || 0, rt[k] || 0);
+    const day = l && x ? ((x.mod || 0) > (l.mod || 0) ? x : l) : (l || x);
+    if (day && (t === 0 || (day.mod || 0) > t)) out.days[k] = day;
+    else if (t) out.tomb[k] = t;
+  });
+  const src = (r.smod || 0) > (a.smod || 0) ? r : a;
+  SYNC_KEYS.forEach(k => { if (src.settings && src.settings[k] !== undefined) out.settings[k] = src.settings[k]; });
+  return out;
+}
+
+function applyMerged(m) {
+  S.days = m.days; S.tomb = m.tomb; S.smod = m.smod;
+  SYNC_KEYS.forEach(k => { if (m.settings[k] !== undefined) S.settings[k] = m.settings[k]; });
+  resnap(); persist(); renderAll();
+}
+
+async function gh(path, opt = {}) {
+  const res = await fetch('https://api.github.com' + path, {
+    method: opt.method || 'GET', cache: 'no-store',
+    headers: Object.assign({ Authorization: 'Bearer ' + sync.token, Accept: 'application/vnd.github+json' }, opt.body ? { 'Content-Type': 'application/json' } : {}),
+    body: opt.body ? JSON.stringify(opt.body) : undefined,
+  });
+  if (!res.ok) { const e = new Error('GitHub ' + res.status); e.status = res.status; throw e; }
+  return res.json();
+}
+
+async function findOrCreateGist() {
+  for (let page = 1; page <= 5; page++) {
+    const list = await gh(`/gists?per_page=100&page=${page}`);
+    const hit = list.find(g => g.files && g.files[SYNC_FILE]);
+    if (hit) { sync.gist = hit.id; saveSyncCfg(); return; }
+    if (list.length < 100) break;
+  }
+  const g = await gh('/gists', { method: 'POST', body: { description: 'Hours sync data (managed by the Hours app)', public: false, files: { [SYNC_FILE]: { content: pack(S) } } } });
+  sync.gist = g.id; saveSyncCfg();
+}
+
+function setSyncStatus(text, err) {
+  syncState.text = text; syncState.err = !!err;
+  if (currentTab === 'settings') renderSettings();
+}
+
+function scheduleSync() {
+  if (!sync.token) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => { syncTimer = null; syncNow(); }, 1500);
+}
+
+async function syncNow() {
+  if (!sync.token || syncState.dead) return;
+  if (syncState.busy) { syncAgain = true; return; }
+  syncState.busy = true;
+  if (!sync.last) setSyncStatus('Syncing…');
+  try {
+    if (!sync.gist) await findOrCreateGist();
+    let g;
+    try { g = await gh('/gists/' + sync.gist); }
+    catch (e) { if (e.status === 404) { sync.gist = null; saveSyncCfg(); syncAgain = true; return; } throw e; }
+    const f = g.files && g.files[SYNC_FILE];
+    let remote = {};
+    if (f) {
+      try { remote = JSON.parse(f.truncated ? await (await fetch(f.raw_url)).text() : f.content) || {}; } catch (e) { remote = {}; }
+    }
+    // No awaits between merging and applying, so edits can't slip in between.
+    const merged = mergeData(S, remote), next = Object.assign({}, S, { days: merged.days, tomb: merged.tomb, smod: merged.smod, settings: Object.assign({}, S.settings, merged.settings) });
+    const out = pack(next);
+    if (out !== pack(S)) applyMerged(merged);
+    if (out !== pack(remote)) await gh('/gists/' + sync.gist, { method: 'PATCH', body: { files: { [SYNC_FILE]: { content: out } } } });
+    sync.last = Date.now(); saveSyncCfg();
+    setSyncStatus('Synced at ' + fmtT(sync.last));
+  } catch (e) {
+    if (e.status === 401 || e.status === 403) { syncState.dead = true; setSyncStatus('GitHub rejected the token. Tap Disconnect, then connect again with a new token.', true); }
+    else if (e instanceof TypeError || !navigator.onLine) setSyncStatus('Offline. Will sync when you are back online.', true);
+    else setSyncStatus('Sync problem (' + e.message + '). Will retry.', true);
+  } finally {
+    syncState.busy = false;
+    if (syncAgain) { syncAgain = false; setTimeout(syncNow, 300); }
+  }
+}
+
+function syncHTML() {
+  if (sync.token) return `<div class="gtitle">Sync</div>
+    <div class="group sync">
+      <div class="li"><div class="lbl">Private GitHub gist<small class="syncstat ${syncState.err ? 'err' : ''}">${syncState.text || (sync.last ? 'Synced at ' + fmtT(sync.last) : 'Waiting…')}</small></div></div>
+      <button class="li" data-act="syncNow">Sync now</button>
+      <button class="li red" data-act="syncOff">Disconnect this device</button>
+    </div>`;
+  return `<div class="gtitle">Sync</div>
+    <div class="group sync">
+      <div class="help">Keep your hours the same on your phone and computer, using a private gist in your own GitHub account.
+        <ol style="margin:8px 0 0;padding-left:20px">
+          <li style="display:list-item;min-height:0;padding:0">Create a <a href="https://github.com/settings/tokens/new?scopes=gist&description=Hours%20sync" target="_blank" rel="noopener">classic token</a> with only the <b>gist</b> permission.</li>
+          <li style="display:list-item;min-height:0;padding:0">Paste it below. Use the same token on every device.</li>
+        </ol></div>
+      <div class="li col"><input type="password" id="syncToken" placeholder="ghp_…" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="GitHub token">
+        <button class="btn primary" data-act="syncConnect">Connect</button></div>
+    </div>
+    <div class="gfoot">The token is saved only in this browser.</div>`;
+}
+
 /* ---------- Appearance ---------- */
 const isStandalone = () => navigator.standalone || matchMedia('(display-mode: standalone)').matches;
 const statusBarIsLight = t => t === 'light' || (t === 'system' && !matchMedia('(prefers-color-scheme: dark)').matches);
@@ -864,6 +1120,9 @@ function applyAppearance() {
   if (!s.colors || typeof s.colors !== 'object') s.colors = {};
   if (s.theme === 'system') root.removeAttribute('data-theme'); else root.dataset.theme = s.theme;
   root.style.setProperty('--font', (FONTS[s.font] || FONTS.default)[1]);
+  const ts = (TEXT_SIZES.includes(s.textSize) ? s.textSize : 100) / 100;
+  root.style.setProperty('--ts', ts);
+  if (ts >= 1.3) root.dataset.big = ''; else delete root.dataset.big;
   Object.keys(MODES).forEach(m => s.colors[m] ? root.style.setProperty('--' + m, s.colors[m]) : root.style.removeProperty('--' + m));
   const bg = getComputedStyle(root).getPropertyValue('--bg').trim();
   document.querySelectorAll('meta[name="theme-color"]').forEach(el => el.remove());
@@ -874,6 +1133,7 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyAppea
 
 applyAppearance();
 renderAll();
+syncNow();
 </script>
 </body>
 </html>
